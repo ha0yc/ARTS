@@ -3,12 +3,12 @@
 * difficulty: Medium
 * description: Given a sequence of n integers a1, a2, ..., an, a 132 pattern is a subsequence ai, aj, ak such that i < j < k and ai < ak < aj. Design an algorithm that takes a list of n numbers as input and checks whether there is a 132 pattern in the list.
 
-* analyse:因为平时用java比较多，所以还是想在刷题的时候练一练python。其实在做这道题的时候没有什么头绪，开始先暴力解了一遍，大概是n的三次方的复杂度,但是肯定是TLE了。然后想了下优化的解法，先考虑优化到n的平方的复杂度。考虑binary search的方法，由于132pattern和找峰值的题目很类似，但是由于其中这三个数字不是连续排位的，所以不能简单适用。
+* analyse:因为平时用java比较多，所以还是想在刷题的时候练一练python。其实在做这道题的时候没有什么头绪，开始先暴力解了一遍，大概是n的三次方的复杂度,但是肯定是TLE了。然后想了下优化的解法，先考虑优化到n的平方的复杂度。考虑binary search的方法，由于132pattern和找峰值的题目很类似，但是由于其中这三个数字不是连续排位的，所以不能简单适用。
 * solution
 
     1. Solution 1 O(n*n)
 
-        这个解法就是从左向右遍历，找到向上的趋势；然后从此位置再向右找到向下的趋势；找到向下的趋势后再向右找到介于这个区间的点。每个趋势开始的地方其实就是一个极点。每次遍历就是找到从左向右的所有的极小值，找到每个极小值之后都会向右找到右边区间所有的极大值，从而找到是否存在132Pattern。
+        这个解法就是从左向右遍历，找到向上的趋势；然后从此位置再向右找到向下的趋势；找到向下的趋势后再向右找到介于这个区间的点。每个趋势开始的地方其实就是一个极点。每次遍历就是找到从左向右的所有的极小值，找到每个极小值之后都会向右找到右边区间所有的极大值，从而找到是否存在132Pattern。
         代码如下：
         ```python
             def find132Pattern(self, nums):
@@ -40,7 +40,7 @@
         ```
     2. Solution2 n*n
         
-        这个解法就是找到每个点左边的最小值，可以这样看：当左边区间取最小值时，最小值和当前点组成的最小值-最大值对可以获得132pattern的概率最大。
+        这个解法就是找到每个点左边的最小值，可以这样看：当左边区间取最小值时，最小值和当前点组成的最小值-最大值对可以获得132pattern的概率最大。
         ```python
             def find132PatternWithMin(self, nums):
                 """
@@ -65,8 +65,8 @@
     
     3. Solution 3 O(n)
 
-        这个解法是看了discuss里面的一个根据栈的解法来做的（https://discuss.leetcode.com/topic/67881/single-pass-c-o-n-space-and-time-solution-8-lines-with-detailed-explanation）
-        也就是，从右向左遍历，s1是132中的1，即遍历对应的值，也就是要找s1右边是否存在32.初始化s3为比s1小的最大值，从右向左，如果stack空或者s1比当前栈顶值大，则出栈并更新s3直到栈顶比s1大。也就是栈内存的是按顺序的降序的数字，同时栈内存储的都是比s3大的数字，而且每次遍历都保证stack非空。因此由于栈内总比s3要大，所以只要找到比s3小的s1就可以了。
+        这个解法是看了discuss里面的一个根据栈的解法来做的（https://discuss.leetcode.com/topic/67881/single-pass-c-o-n-space-and-time-solution-8-lines-with-detailed-explanation）
+        也就是，从右向左遍历，s1是132中的1，即遍历对应的值，也就是要找s1右边是否存在32.初始化s3为比s1小的最大值，从右向左，如果stack空或者s1比当前栈顶值大，则出栈并更新s3直到栈顶比s1大。也就是栈内存的是按顺序的降序的数字，同时栈内存储的都是比s3大的数字，而且每次遍历都保证stack非空。因此由于栈内总比s3要大，所以只要找到比s3小的s1就可以了。
     
         ```python
             def find132pattern(self, nums):
@@ -96,20 +96,20 @@
 # Share
 ## [Do-it-yourself NLP for bot developers](https://medium.com/rasa-blog/do-it-yourself-nlp-for-bot-developers-2e2da2817f3d, "Medium link")
 
-最近公司有需求要做基于客服对话数据的chatbot，要求满足能查询数据的需求。开始考虑基于rasa_nlu做对话系统，但是rasa的backend中spacy不支持中文模型，需要修改rasa源码和spacy源码；MITIE对机器性能要求过高，而且rasa官方也在考虑不再支持MITIE。查询资料时在medium上读到了这篇rasa作者写的对于chatbot开发者的指导，即为什么建议开发者建立自己的语言解析器而不是使用第三方API。
+最近公司有需求要做基于客服对话数据的chatbot，要求满足能查询数据的需求。开始考虑基于rasa_nlu做对话系统，但是rasa的backend中spacy不支持中文模型，需要修改rasa源码和spacy源码；MITIE对机器性能要求过高，而且rasa官方也在考虑不再支持MITIE。查询资料时在medium上读到了这篇rasa作者写的对于chatbot开发者的指导，即为什么建议开发者建立自己的语言解析器而不是使用第三方API。
 
 首先，要明白对一句话进行回复需要做什么工作。第一，明白这句话的意图-intent。第二，提取这句话里面你查询需要的信息。
 
-文章列举了三个自己进行NLP的理由
+文章列举了三个自己进行NLP的理由
 
-* 如果你做的是基于商业场景下的chatbot，最好不要将用户传递的信息再传递给facebook或者microsoft
+* 如果你做的是基于商业场景下的chatbot，最好不要将用户传递的信息再传递给facebook或者microsoft
 * http响应速度慢，而且你的程序也会被API的参数设计所限制；而使用组件库的话，可以根据自己的需求进行改造
 * 可以根据已有数据和场景进行优化
 
-文章接下来给出了基于词向量的简单实践，使用GLove做词嵌入,然后根据词向量做关键词匹配，选择相似度得分大于某个阈值的词语；然后做语义分类，将表达句子的词向量拼接起来,然后根据距离进行分类。之后介绍了使用库如何实践，比如spacy/MITIE。
+文章接下来给出了基于词向量的简单实践，使用GLove做词嵌入,然后根据词向量做关键词匹配，选择相似度得分大于某个阈值的词语；然后做语义分类，将表达句子的词向量拼接起来,然后根据距离进行分类。之后介绍了使用库如何实践，比如spacy/MITIE。
 
 # Tip
-## Adding Zh Model to SpaCy
+## Adding Zh Model to SpaCy
 这里根据工作实践介绍下，如何向spacy中添加中文模型。
 
 spacy提供了便捷的工具，可以将生成的语言模型打包成独立的package，之后可以利用pip安装。
@@ -412,20 +412,20 @@ spacy官方提供的英语模型包括分词器，词典，命名实体识别模
 ## [如何构建完美的单例模式](https://medium.com/exploring-code/how-to-make-the-perfect-singleton-de6b951dfdb0)
 第一次写ARTS，写对技术文章的分享和点评，开始没写之前是很想写的，但是有不知道怎么下笔。强行克服写完了对算法的总结和Tip，我发现写博客真的是能加深自己的理解，并且把对文章的理解重新梳理一遍。在找Review的素材时，看到这篇文章就非常想把它分享出来，想写点东西。
 
-之前面试问过很多次设计模式，其中最主要的就是问单例模式。可能有的比较简单直接，让你写一个单例模式，要求比较高的就会让你看看是不是线程安全。其实单例模式背是好背的，但是背完了面试过去了，就又忘了。这个问题关键在于理解没理解，这篇文章非常有助于让人理解单例模式。
+之前面试问过很多次设计模式，其中最主要的就是问单例模式。可能有的比较简单直接，让你写一个单例模式，要求比较高的就会让你看看是不是线程安全。其实单例模式背是好背的，但是背完了面试过去了，就又忘了。这个问题关键在于理解没理解，这篇文章非常有助于让人理解单例模式。
 
 首先，我们应该了解单例模式是什么，以及我们为什么要使用单例模式，并且在什么场景下使用单例模式。
 
-简而言之，单例模式就是只提供一个对象实例的设计模式，通过控制对象创建来限制实例数量为1。单例模式只允许一个入口来创建对象实例。单例模式经常出现在当开发人员想控制资源的场景，比如数据库连接或者socket连接。
+简而言之，单例模式就是只提供一个对象实例的设计模式，通过控制对象创建来限制实例数量为1。单例模式只允许一个入口来创建对象实例。单例模式经常出现在当开发人员想控制资源的场景，比如数据库连接或者socket连接。
 
-虽然单例模式听上去很简单，但是当实现的时候有很多需要考虑的地方，而这些刚好可以帮助我们理解、完善单例模式。
+虽然单例模式听上去很简单，但是当实现的时候有很多需要考虑的地方，而这些刚好可以帮助我们理解、完善单例模式。
 
 接下来我们从简单的方法入手，逐渐完善单例模式。
 
 单例模式最简单的实现方式就是使构造器private，由此可以得到两种单例模式，饿汉式（eager initialization）和懒汉式（lazy initialization）。
 
 ### 饿汉式
-饿汉式将构造器设置为private，通过静态方法getInstance()创建和获取对象实例，因而在类加载时实例就被创建了。
+饿汉式将构造器设置为private，通过静态方法getInstance()创建和获取对象实例，因而在类加载时实例就被创建了。
 ```java
 public class SingletonClass {
 
@@ -442,7 +442,7 @@ public class SingletonClass {
 饿汉式有一个问题，就是如果没有客户端使用这个对象实例的话，就可能造成内存泄漏。懒汉式可以解决这个问题。
 
 ### 懒汉式
-和饿汉式不同，懒汉式选择在getInstance()方法里构造对象实例
+和饿汉式不同，懒汉式选择在getInstance()方法里构造对象实例
 ```java
 public class SingletonClass {
 
@@ -459,7 +459,7 @@ public class SingletonClass {
     }
 }
 ```
-我们知道，如果是同一个对象的话，那么其hashcode一定相等。可以通过hash的方法来检测是否获取到了同一个对象实例。
+我们知道，如果是同一个对象的话，那么其hashcode一定相等。可以通过hash的方法来检测是否获取到了同一个对象实例。
 ```java
 public class SingletonTester {
    public static void main(String[] args) {
@@ -477,6 +477,7 @@ public class SingletonTester {
 ```
 运行结果如下：
 ![avatar](lazy-solution.png)
+
 可以看到获取的是同一个实例
 
 ### 反射
@@ -555,7 +556,7 @@ public class SingletonClass {
     }
 }
 ```
-但是对于getInstance()加synchronized关键字有两个缺点，第一就是上锁的开销比较大,第二就是锁的粒度过大。因此我们可以采用double-check的方式来解决粒度过大的问题，也就是当检查到null的时候再上锁，上锁之后为了检查是否和上锁之前状态一致，再检查是否是null。
+但是对于getInstance()加synchronized关键字有两个缺点，第一就是上锁的开销比较大,第二就是锁的粒度过大。因此我们可以采用double-check的方式来解决粒度过大的问题，也就是当检查到null的时候再上锁，上锁之后为了检查是否和上锁之前状态一致，再检查是否是null。
 ```java
 public class SingletonClass {
 
@@ -584,7 +585,7 @@ public class SingletonClass {
     }
 }
 ```
-之后我们可以使用volatile关键字，没有volatile，可能另外一个线程可以读取到单例的半初始化的状态。使用volatile可以添加内存屏障，阻止指令重排，并保证happens-before规则，所有对于对象实例的写都发生在读取之前。
+之后我们可以使用volatile关键字，没有volatile，可能另外一个线程可以读取到单例的半初始化的状态。使用volatile可以添加内存屏障，阻止指令重排，并保证happens-before规则，所有对于对象实例的写都发生在读取之前。
 ```java
 ublic class SingletonClass {
 
@@ -615,7 +616,7 @@ ublic class SingletonClass {
 ```
 
 ### 序列化和反序列化
-将单例对象序列化并反序列化还原以后可以得到两个不同的对象,因此我们通过实现readResolve()方法来解决反序列化后的单例对象不一致问题。
+将单例对象序列化并反序列化还原以后可以得到两个不同的对象,因此我们通过实现readResolve()方法来解决反序列化后的单例对象不一致问题。
 ```java
 
 public class SingletonClass implements Serializable {
@@ -647,7 +648,7 @@ public class SingletonClass implements Serializable {
     }
 }
 ```
-在解决了线程、反射和序列化带来的问题之后，这时的单例模式仍然不是完美的单例模式，对于不同的加载器下和clone也会是不安全的，但是这样的应用场景很少，我们基本上不再考虑了。
+在解决了线程、反射和序列化带来的问题之后，这时的单例模式仍然不是完美的单例模式，对于不同的加载器下和clone也会是不安全的，但是这样的应用场景很少，我们基本上不再考虑了。
 
 
 
