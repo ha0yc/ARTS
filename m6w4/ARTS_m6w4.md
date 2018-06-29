@@ -408,6 +408,248 @@ spacy官方提供的英语模型包括分词器，词典，命名实体识别模
     pip install dist/zh_sample-0.0.0.tar.gz
     ```
 
+# Review
+## [如何构建完美的单例模式](https://medium.com/exploring-code/how-to-make-the-perfect-singleton-de6b951dfdb0)
+第一次写ARTS，写对技术文章的分享和点评，开始没写之前是很想写的，但是有不知道怎么下笔。强行克服写完了对算法的总结和Tip，我发现写博客真的是能加深自己的理解，并且把对文章的理解重新梳理一遍。在找Review的素材时，看到这篇文章就非常想把它分享出来，想写点东西。
+
+之前面试问过很多次设计模式，其中最主要的就是问单例模式。可能有的比较简单直接，让你写一个单例模式，要求比较高的就会让你看看是不是线程安全。其实单例模式背是好背的，但是背完了面试过去了，就又忘了。这个问题关键在于理解没理解，这篇文章非常有助于让人理解单例模式。
+
+首先，我们应该了解单例模式是什么，以及我们为什么要使用单例模式，并且在什么场景下使用单例模式。
+
+简而言之，单例模式就是只提供一个对象实例的设计模式，通过控制对象创建来限制实例数量为1。单例模式只允许一个入口来创建对象实例。单例模式经常出现在当开发人员想控制资源的场景，比如数据库连接或者socket连接。
+
+虽然单例模式听上去很简单，但是当实现的时候有很多需要考虑的地方，而这些刚好可以帮助我们理解、完善单例模式。
+
+接下来我们从简单的方法入手，逐渐完善单例模式。
+
+单例模式最简单的实现方式就是使构造器private，由此可以得到两种单例模式，饿汉式（eager initialization）和懒汉式（lazy initialization）。
+
+### 饿汉式
+饿汉式将构造器设置为private，通过静态方法getInstance()创建和获取对象实例，因而在类加载时实例就被创建了。
+```java
+public class SingletonClass {
+
+    private static volatile SingletonClass sSoleInstance = new SingletonClass();
+
+    //private constructor.
+    private SingletonClass(){}
+
+    public static SingletonClass getInstance() {
+        return sSoleInstance;
+    }
+}
+```
+饿汉式有一个问题，就是如果没有客户端使用这个对象实例的话，就可能造成内存泄漏。懒汉式可以解决这个问题。
+
+### 懒汉式
+和饿汉式不同，懒汉式选择在getInstance()方法里构造对象实例
+```java
+public class SingletonClass {
+
+    private static SingletonClass sSoleInstance;
+
+    private SingletonClass(){}  //private constructor.
+
+    public static SingletonClass getInstance(){
+        if (sSoleInstance == null){ //if there is no instance available... create new one
+            sSoleInstance = new SingletonClass();
+        }
+
+        return sSoleInstance;
+    }
+}
+```
+我们知道，如果是同一个对象的话，那么其hashcode一定相等。可以通过hash的方法来检测是否获取到了同一个对象实例。
+```java
+public class SingletonTester {
+   public static void main(String[] args) {
+        //Instance 1
+        SingletonClass instance1 = SingletonClass.getInstance();
+
+        //Instance 2
+        SingletonClass instance2 = SingletonClass.getInstance();
+
+        //now lets check the hash key.
+        System.out.println("Instance 1 hash:" + instance1.hashCode());
+        System.out.println("Instance 2 hash:" + instance2.hashCode());  
+   }
+}
+```
+运行结果如下：
+![avatar](lazy-solution.png)
+可以看到获取的是同一个实例
+
+### 反射
+反射是程序在运行时透过Reflection APIs取得并修改任何一个已知名称的class的内部信息的行为。假如我们通过反射将构造函数的标识符修改为public然后生成新的对象实例，再通过getInstance()获取的将会是不同的对象实例。
+```java
+public class SingletonTester {
+   public static void main(String[] args) {
+        //Create the 1st instance
+        SingletonClass instance1 = SingletonClass.getInstance();
+        
+        //Create 2nd instance using Java Reflection API.
+        SingletonClass instance2 = null;
+        try {
+            Class<SingletonClass> clazz = SingletonClass.class;
+            Constructor<SingletonClass> cons = clazz.getDeclaredConstructor();
+            cons.setAccessible(true);
+            instance2 = cons.newInstance();
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+
+        //now lets check the hash key.
+        System.out.println("Instance 1 hash:" + instance1.hashCode());
+        System.out.println("Instance 2 hash:" + instance2.hashCode());
+   }
+}
+```
+由于反射之后是根据构造函数直接创建的对象实例，所以我们可以选择从根本上杜绝这一行为，也就是在构造函数中抛出异常。
+```java
+public class SingletonClass {
+
+    private static SingletonClass sSoleInstance;
+
+    //private constructor.
+    private SingletonClass(){
+       
+        //Prevent form the reflection api.
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    } 
+
+    public static SingletonClass getInstance(){
+        if (sSoleInstance == null){ //if there is no instance available... create new one
+            sSoleInstance = new SingletonClass();
+        }
+
+        return sSoleInstance;
+    }
+}
+```
+### 线程安全
+假设单例对象实例还未被创建，当有两个线程同时调用getInstance()的时候会创建两个对象实例，因此是线程不安全的。
+
+首先我们可以通过对getInstance()加synchronized关键字保证线程安全
+```java
+public class SingletonClass {
+
+    private static SingletonClass sSoleInstance;
+
+    //private constructor.
+    private SingletonClass(){
+       
+        //Prevent form the reflection api.
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    } 
+
+    public synchronized static SingletonClass getInstance(){
+        if (sSoleInstance == null){ //if there is no instance available... create new one
+            sSoleInstance = new SingletonClass();
+        }
+
+        return sSoleInstance;
+    }
+}
+```
+但是对于getInstance()加synchronized关键字有两个缺点，第一就是上锁的开销比较大,第二就是锁的粒度过大。因此我们可以采用double-check的方式来解决粒度过大的问题，也就是当检查到null的时候再上锁，上锁之后为了检查是否和上锁之前状态一致，再检查是否是null。
+```java
+public class SingletonClass {
+
+    private static SingletonClass sSoleInstance;
+
+    //private constructor.
+    private SingletonClass(){
+
+        //Prevent form the reflection api.
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+
+    public static SingletonClass getInstance() {
+        //Double check locking pattern
+        if (sSoleInstance == null) { //Check for the first time
+          
+            synchronized (SingletonClass.class) {   //Check for the second time.
+              //if there is no instance available... create new one
+              if (sSoleInstance == null) sSoleInstance = new SingletonClass();
+            }
+        }
+
+        return sSoleInstance;
+    }
+}
+```
+之后我们可以使用volatile关键字，没有volatile，可能另外一个线程可以读取到单例的半初始化的状态。使用volatile可以添加内存屏障，阻止指令重排，并保证happens-before规则，所有对于对象实例的写都发生在读取之前。
+```java
+ublic class SingletonClass {
+
+    private static volatile SingletonClass sSoleInstance;
+
+    //private constructor.
+    private SingletonClass(){
+
+        //Prevent form the reflection api.
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+
+    public static SingletonClass getInstance() {
+        //Double check locking pattern
+        if (sSoleInstance == null) { //Check for the first time
+          
+            synchronized (SingletonClass.class) {   //Check for the second time.
+              //if there is no instance available... create new one
+              if (sSoleInstance == null) sSoleInstance = new SingletonClass();
+            }
+        }
+
+        return sSoleInstance;
+    }
+}
+```
+
+### 序列化和反序列化
+将单例对象序列化并反序列化还原以后可以得到两个不同的对象,因此我们通过实现readResolve()方法来解决反序列化后的单例对象不一致问题。
+```java
+
+public class SingletonClass implements Serializable {
+
+    private static volatile SingletonClass sSoleInstance;
+
+    //private constructor.
+    private SingletonClass(){
+
+        //Prevent form the reflection api.
+        if (sSoleInstance != null){
+            throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
+        }
+    }
+
+    public static SingletonClass getInstance() {
+        if (sSoleInstance == null) { //if there is no instance available... create new one
+            synchronized (SingletonClass.class) {
+                if (sSoleInstance == null) sSoleInstance = new SingletonClass();
+            }
+        }
+
+        return sSoleInstance;
+    }
+
+    //Make singleton from serialize and deserialize operation.
+    protected SingletonClass readResolve() {
+        return getInstance();
+    }
+}
+```
+在解决了线程、反射和序列化带来的问题之后，这时的单例模式仍然不是完美的单例模式，对于不同的加载器下和clone也会是不安全的，但是这样的应用场景很少，我们基本上不再考虑了。
+
+
 
 
 
