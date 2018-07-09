@@ -4,7 +4,7 @@
 * difficulty: Medium
 * description: Given a list of daily temperatures, produce a list that, for each day in the input, tells you how many days you would have to wait until a warmer temperature. If there is no future day for which this is possible, put 0 instead.For example, given the list temperatures = [73, 74, 75, 71, 69, 72, 76, 73], your output should be [1, 1, 4, 2, 1, 1, 0, 0].
 
-* analysis: 根据题目，可知要找到每一个数字后面第一个比它大的数字，并计算下标距离。首先考虑暴力解法，很简单，当数组过长时肯定会TLE，所以暴力解法不可取。因此想到考虑用栈的思路，栈根据条件必然是降序排列，因此导致站内数字出栈的必定是数字后面第一个比它大的数字。数组从前向后遍历，遇到比栈内数字大的就将出栈即可，但是这样无法记录数字之间的下标差。因此，栈内考虑存储下标即可解决问题。
+* analysis: 根据题目，可知要找到每一个数字后面第一个比它大的数字，并计算下标距离。首先考虑暴力解法，很简单，当数组过长时肯定会TLE，所以暴力解法不可取。因此想到考虑用栈的思路，栈根据条件必然是降序排列，因此导致站内数字出栈的必定是数字后面第一个比它大的数字。数组从前向后遍历，遇到比栈内数字大的就将出栈即可，但是这样无法记录数字之间的下标差。因此，栈内考虑存储下标即可解决问题。
 
 * code
     ```python
@@ -40,7 +40,7 @@
 
 # Tip
 
-最近有个小需求，生产环境上的应用是java的，要上线的新应用是python的。为保证速度和稳定性，不考虑调用http接口，因此将python工程打成jar包发上去。
+最近有个小需求，生产环境上的应用是java的，要上线的新应用是python的。为保证速度和稳定性，不考虑调用http接口，因此将python工程打成jar包发上去。
 
 使用https://github.com/yishenggudou/jythontools：
 ```
@@ -128,4 +128,5 @@ fetch('api/user/1', {
 })
 ```
 服务器验证流程：
+
 ![avatar](jwt-authentication.png)
